@@ -1,0 +1,171 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tests - Estrategia de validacion &mdash; documentación de MalariaProject - Crystal Growth with kMC method - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icono.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="prev" title="results - Artefactos de salida" href="resultados.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_new.png" class="logo" alt="Logotipo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduccion.html">MalariaProject</a></li>
+<li class="toctree-l1"><a class="reference internal" href="metodologia_kmc.html">src - Documentacion tecnica del nucleo kMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datos.html">data - Convenciones de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">notebooks - Guia de experimentos reproducibles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resultados.html">results - Artefactos de salida</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">tests - Estrategia de validacion</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#archivos-de-prueba-actuales">Archivos de prueba actuales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#alcance-cubierto">Alcance cubierto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estado-importante-de-compatibilidad">Estado importante de compatibilidad</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ejecucion-recomendada">Ejecucion recomendada</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#criterios-minimos-antes-de-publicar-documentacion">Criterios minimos antes de publicar documentacion</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MalariaProject - Crystal Growth with kMC method</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">tests - Estrategia de validacion</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pruebas.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="tests-estrategia-de-validacion">
+<h1>tests - Estrategia de validacion<a class="headerlink" href="#tests-estrategia-de-validacion" title="Link to this heading"></a></h1>
+<p>La carpeta <code class="docutils literal notranslate"><span class="pre">tests/</span></code> combina pruebas del nucleo estable con pruebas de lineas experimentales.</p>
+<section id="archivos-de-prueba-actuales">
+<h2>Archivos de prueba actuales<a class="headerlink" href="#archivos-de-prueba-actuales" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test_utils.py</span></code>: robustez numerica (<code class="docutils literal notranslate"><span class="pre">_safe_exp</span></code>, <code class="docutils literal notranslate"><span class="pre">_finite_or_zero</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_lattice.py</span></code>: geometria SOS, PBC y reglas de migracion.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_bkl.py</span></code>: consistencia del motor BKL base (tasas, bins, balance de masa).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tests_suite.py</span></code>: suite agregada para ejecucion integral.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_adsorption_probability_analysis.py</span></code>: pruebas de analisis de probabilidad de adsorcion y sigma fijo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_paper_kmc.py</span></code>: pruebas para una API <code class="docutils literal notranslate"><span class="pre">paper_kmc</span></code> (cara 110/101 y regimenes).</p></li>
+</ul>
+</section>
+<section id="alcance-cubierto">
+<h2>Alcance cubierto<a class="headerlink" href="#alcance-cubierto" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Estabilidad numerica de utilidades criticas.</p></li>
+<li><p>Integridad geometrica de la red SOS.</p></li>
+<li><p>Consistencia de seleccion de eventos y conservacion de materia en BKL.</p></li>
+<li><p>Comportamiento del nucleo base con sobresaturacion dinamica (deplecion de reservorio).</p></li>
+</ul>
+</section>
+<section id="estado-importante-de-compatibilidad">
+<h2>Estado importante de compatibilidad<a class="headerlink" href="#estado-importante-de-compatibilidad" title="Link to this heading"></a></h2>
+<p>En el estado actual de <code class="docutils literal notranslate"><span class="pre">src/</span></code>, no existen <code class="docutils literal notranslate"><span class="pre">analysis.py</span></code> ni <code class="docutils literal notranslate"><span class="pre">paper_kmc.py</span></code>.</p>
+<p>Por ello:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">test_adsorption_probability_analysis.py</span></code> y <code class="docutils literal notranslate"><span class="pre">test_paper_kmc.py</span></code> requieren completar/ajustar implementaciones antes de formar parte de la bateria estable de CI.</p></li>
+<li><p>Los escenarios de sigma fijo se consideran cobertura experimental hasta cerrar esa integracion.</p></li>
+</ul>
+</section>
+<section id="ejecucion-recomendada">
+<h2>Ejecucion recomendada<a class="headerlink" href="#ejecucion-recomendada" title="Link to this heading"></a></h2>
+<p>Para correr solo el nucleo estable:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">unittest</span> <span class="pre">tests.test_utils</span> <span class="pre">tests.test_lattice</span> <span class="pre">tests.test_bkl</span></code></p></li>
+</ul>
+<p>Para ejecutar todo el directorio y detectar faltantes de integracion:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">unittest</span> <span class="pre">discover</span> <span class="pre">-s</span> <span class="pre">tests</span> <span class="pre">-p</span> <span class="pre">&quot;test_*.py&quot;</span></code></p></li>
+</ul>
+</section>
+<section id="criterios-minimos-antes-de-publicar-documentacion">
+<h2>Criterios minimos antes de publicar documentacion<a class="headerlink" href="#criterios-minimos-antes-de-publicar-documentacion" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Sin fallos en pruebas estables del nucleo.</p></li>
+<li><p>Sin errores de import en modulos documentados de <code class="docutils literal notranslate"><span class="pre">src/</span></code>.</p></li>
+<li><p>Sin warnings criticos al construir Sphinx en modo estricto.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="resultados.html" class="btn btn-neutral float-left" title="results - Artefactos de salida" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, Sebastian Gaviria Giraldo - Hernan Salinas - German Torres.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

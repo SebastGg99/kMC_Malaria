@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MalariaProject &mdash; documentación de MalariaProject - Crystal Growth with kMC method - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/icono.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="src - Documentacion tecnica del nucleo kMC" href="metodologia_kmc.html" />
+    <link rel="prev" title="Welcome to MalariaProject - Crystal Growth with kMC method’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/logo_new.png" class="logo" alt="Logotipo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MalariaProject</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#descripcion-general">Descripción General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#actualizaciones-relevantes-del-nucleo">Actualizaciones relevantes del núcleo</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#red-sos-base-lattice-py">1. Red SOS base (<code class="docutils literal notranslate"><span class="pre">lattice.py</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parametros-base-params-py">2. Parámetros base (<code class="docutils literal notranslate"><span class="pre">params.py</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#motor-bkl-base-bkl-py">3. Motor BKL base (<code class="docutils literal notranslate"><span class="pre">bkl.py</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linea-v2-v2-py">4. Línea v2 (<code class="docutils literal notranslate"><span class="pre">*_v2.py</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diferencia-principal-entre-lineas">5. Diferencia principal entre líneas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utilidades-y-api-del-paquete">6. Utilidades y API del paquete</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flujo-recomendado-de-simulacion">Flujo recomendado de simulación</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="metodologia_kmc.html">src - Documentacion tecnica del nucleo kMC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datos.html">data - Convenciones de datos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">notebooks - Guia de experimentos reproducibles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resultados.html">results - Artefactos de salida</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pruebas.html">tests - Estrategia de validacion</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MalariaProject - Crystal Growth with kMC method</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MalariaProject</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduccion.md.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="malariaproject">
+<h1>MalariaProject<a class="headerlink" href="#malariaproject" title="Link to this heading"></a></h1>
+<section id="descripcion-general">
+<h2>Descripción General<a class="headerlink" href="#descripcion-general" title="Link to this heading"></a></h2>
+<p>MalariaProject implementa simulaciones <strong>Kinetic Monte Carlo (kMC)</strong> para crecimiento cristalino sobre superficies <strong>Solid-On-Solid (SOS)</strong> con condiciones periódicas y selección de eventos tipo <strong>BKL (n-fold way)</strong>.</p>
+<p>Actualmente el proyecto tiene dos líneas principales de modelado en <code class="docutils literal notranslate"><span class="pre">src/</span></code>:</p>
+<ul class="simple">
+<li><p>Línea base (<code class="docutils literal notranslate"><span class="pre">params.py</span></code>, <code class="docutils literal notranslate"><span class="pre">lattice.py</span></code>, <code class="docutils literal notranslate"><span class="pre">bkl.py</span></code>, <code class="docutils literal notranslate"><span class="pre">plotter.py</span></code>).</p></li>
+<li><p>Línea v2, orientada a reproducción de resultados de referencia principal (<code class="docutils literal notranslate"><span class="pre">params_v2.py</span></code>, <code class="docutils literal notranslate"><span class="pre">lattice_v2.py</span></code>, <code class="docutils literal notranslate"><span class="pre">bkl_v2.py</span></code>, <code class="docutils literal notranslate"><span class="pre">plotter_v2.py</span></code>).</p></li>
+</ul>
+<p>Además, se mantiene una variante alternativa de un modelo en 2D (<code class="docutils literal notranslate"><span class="pre">model2D.py</span></code>) con las mismas condiciones periódicas y el mismo algoritmo de selección de eventos.</p>
+</section>
+<section id="actualizaciones-relevantes-del-nucleo">
+<h2>Actualizaciones relevantes del núcleo<a class="headerlink" href="#actualizaciones-relevantes-del-nucleo" title="Link to this heading"></a></h2>
+<section id="red-sos-base-lattice-py">
+<h3>1. Red SOS base (<code class="docutils literal notranslate"><span class="pre">lattice.py</span></code>)<a class="headerlink" href="#red-sos-base-lattice-py" title="Link to this heading"></a></h3>
+<p>La clase <code class="docutils literal notranslate"><span class="pre">LatticeSOS</span></code> mantiene vecindad de 4 vecinos y contorno periódico, e incorpora:</p>
+<ul class="simple">
+<li><p>Inicialización reproducible por semilla.</p></li>
+<li><p>Método <code class="docutils literal notranslate"><span class="pre">seed_surface_with_islands(...)</span></code> para sembrar islas mono-capa en sitios únicos.</p></li>
+<li><p>Reglas de migración con restricción geométrica (no migrar a columnas más altas).</p></li>
+</ul>
+</section>
+<section id="parametros-base-params-py">
+<h3>2. Parámetros base (<code class="docutils literal notranslate"><span class="pre">params.py</span></code>)<a class="headerlink" href="#parametros-base-params-py" title="Link to this heading"></a></h3>
+<p>La <code class="docutils literal notranslate"><span class="pre">dataclass</span></code> <code class="docutils literal notranslate"><span class="pre">KMCParams</span></code> incluye los parámetros cinéticos y termodinámicos del modelo clásico:</p>
+<ul class="simple">
+<li><p>Variables termodinámicas de depleción (<code class="docutils literal notranslate"><span class="pre">V</span></code>, <code class="docutils literal notranslate"><span class="pre">C_eq</span></code>) para sobresaturación dinámica.</p></li>
+<li><p>Clamps <code class="docutils literal notranslate"><span class="pre">S_floor</span></code> y <code class="docutils literal notranslate"><span class="pre">S_ceil</span></code> para estabilidad numérica.</p></li>
+</ul>
+</section>
+<section id="motor-bkl-base-bkl-py">
+<h3>3. Motor BKL base (<code class="docutils literal notranslate"><span class="pre">bkl.py</span></code>)<a class="headerlink" href="#motor-bkl-base-bkl-py" title="Link to this heading"></a></h3>
+<p>La clase <code class="docutils literal notranslate"><span class="pre">KMC_BKL</span></code> implementa:</p>
+<ul class="simple">
+<li><p>Tasas de adsorción, desorción, migración e incorporación con protección numérica.</p></li>
+<li><p>Sobresaturación dinámica por depleción del reservorio (<code class="docutils literal notranslate"><span class="pre">N_bulk</span></code>) en el flujo base.</p></li>
+<li><p>Clasificación por coordinación local para selección rejection-free.</p></li>
+<li><p>Validaciones internas en modo <code class="docutils literal notranslate"><span class="pre">debug</span></code> (consistencia de bins, tasas y chequeos termodinámicos y de consistencia física).</p></li>
+</ul>
+<p>También se mantienen variantes de control selectivo de procesos:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SelectiveKMC</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KMC_NoDesNoMig</span></code></p></li>
+</ul>
+</section>
+<section id="linea-v2-v2-py">
+<h3>4. Línea v2 (<code class="docutils literal notranslate"><span class="pre">*_v2.py</span></code>)<a class="headerlink" href="#linea-v2-v2-py" title="Link to this heading"></a></h3>
+<p>La variante v2 introduce una formulación alineada con el artículo de referencia principal:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">KMCParams_v2</span></code> con parámetros adimensionales y <code class="docutils literal notranslate"><span class="pre">fixed_sigma</span></code> opcional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LatticeSOS_v2</span></code> con modos de inicialización <code class="docutils literal notranslate"><span class="pre">flat</span></code>, <code class="docutils literal notranslate"><span class="pre">random</span></code>, <code class="docutils literal notranslate"><span class="pre">seeds</span></code> y <code class="docutils literal notranslate"><span class="pre">screw</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KMC_BKL_v2</span></code> con manejo explícito de:</p>
+<ul>
+<li><p>$\sigma = C/C_{eq} - 1$ (magnitud física de entrada).</p></li>
+<li><p>$S = \ln(1+\sigma)$ (magnitud interna de las tasas).</p></li>
+<li><p>Opción de sobresaturación fija (<code class="docutils literal notranslate"><span class="pre">fixed_sigma</span></code>).</p></li>
+<li><p>Si <code class="docutils literal notranslate"><span class="pre">fixed_sigma</span></code> no está activo, operación con concentración constante o reservorio dinámico.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Plotter_v2</span></code> con visualización 3D, GIF y utilidades de análisis de velocidad/probabilidades.</p></li>
+</ul>
+</section>
+<section id="diferencia-principal-entre-lineas">
+<h3>5. Diferencia principal entre líneas<a class="headerlink" href="#diferencia-principal-entre-lineas" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Línea base: sobresaturación diseñada para evolucionar dinámicamente con depleción de soluto.</p></li>
+<li><p>Línea v2: mantiene esa posibilidad y además habilita sobresaturación fija mediante <code class="docutils literal notranslate"><span class="pre">fixed_sigma</span></code>.</p></li>
+</ul>
+</section>
+<section id="utilidades-y-api-del-paquete">
+<h3>6. Utilidades y API del paquete<a class="headerlink" href="#utilidades-y-api-del-paquete" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">utils.py</span></code> centraliza utilidades robustas (<code class="docutils literal notranslate"><span class="pre">_safe_exp</span></code>, <code class="docutils literal notranslate"><span class="pre">_finite_or_zero</span></code>) y helpers de vecindad para <code class="docutils literal notranslate"><span class="pre">model2D.py</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">src/__init__.py</span></code> exporta las clases y funciones principales de ambas líneas (base y v2).</p></li>
+</ul>
+</section>
+</section>
+<section id="flujo-recomendado-de-simulacion">
+<h2>Flujo recomendado de simulación<a class="headerlink" href="#flujo-recomendado-de-simulacion" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Definir parámetros (<code class="docutils literal notranslate"><span class="pre">KMCParams</span></code> o <code class="docutils literal notranslate"><span class="pre">KMCParams_v2</span></code>).</p></li>
+<li><p>Construir e inicializar la red (<code class="docutils literal notranslate"><span class="pre">LatticeSOS</span></code> o <code class="docutils literal notranslate"><span class="pre">LatticeSOS_v2</span></code>).</p></li>
+<li><p>Instanciar el motor (<code class="docutils literal notranslate"><span class="pre">KMC_BKL</span></code> o <code class="docutils literal notranslate"><span class="pre">KMC_BKL_v2</span></code>).</p></li>
+<li><p>Ejecutar <code class="docutils literal notranslate"><span class="pre">run(...)</span></code> y recolectar snapshots/estadísticas.</p></li>
+<li><p>Visualizar con <code class="docutils literal notranslate"><span class="pre">Plotter</span></code>/<code class="docutils literal notranslate"><span class="pre">Plotter_v2</span></code> y guardar artefactos en <code class="docutils literal notranslate"><span class="pre">results/</span></code>.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to MalariaProject - Crystal Growth with kMC method’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="metodologia_kmc.html" class="btn btn-neutral float-right" title="src - Documentacion tecnica del nucleo kMC" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2026, Sebastian Gaviria Giraldo - Hernan Salinas - German Torres.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
