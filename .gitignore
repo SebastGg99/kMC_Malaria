@@ -1,0 +1,12 @@
+#Ignorar entorno virtual de Python
+venv/
+
+# Ignorar carpeta de configuración de GitHub y acciones
+#.github/
+
+# Ignorar carpeta de datos
+data/
+
+# Ignorar __pycache__ en cualquier directorio del proyecto
+__pycache__/
+*.pyc

@@ -1,0 +1,50 @@
+{
+  "run_id": "size_80x80_sigma_0.4_seed_123",
+  "size": [
+    80,
+    80
+  ],
+  "n_seeds": 500,
+  "time_scale": 70.0,
+  "fixed_sigma": 0.4,
+  "rng_seed": 123,
+  "lattice_seed": 42,
+  "times": [
+    0.0,
+    0.5,
+    1.0,
+    1.5,
+    2.0,
+    2.5,
+    3.0,
+    3.5,
+    4.0,
+    4.5,
+    5.0
+  ],
+  "params": {
+    "K0_plus": 1.16718,
+    "E_pb_over_kT_x": 1.2704636027368605,
+    "E_pb_over_kT_y": 1.2704636027368605,
+    "phi_over_kT": 1.4792478012079329,
+    "delta_x": 1.7789686274068774,
+    "delta_y": 1.7789686274068774,
+    "V": 1,
+    "C_eq": 15.0,
+    "K_inc_plus": 0.5069325183371898,
+    "fixed_sigma": 0.4,
+    "S_floor": -5.0,
+    "S_ceil": 9.0,
+    "solvent_ads_factor": 1.0,
+    "solvent_des_factor": 1.0,
+    "solvent_mig_factor": 1.0,
+    "solvent_inc_factor": 1.0
+  },
+  "paths": {
+    "conversion_csv": "results/outputs_iso/size_80x80_sigma_0.4_seed_123/conversion_history.csv",
+    "conversion_npy": "results/outputs_iso/size_80x80_sigma_0.4_seed_123/conversion_history.npy",
+    "snaps_pkl": "results/outputs_iso/size_80x80_sigma_0.4_seed_123/snaps.pkl",
+    "stats_pkl": "results/outputs_iso/size_80x80_sigma_0.4_seed_123/stats.pkl",
+    "kmc_pkl": "results/outputs_iso/size_80x80_sigma_0.4_seed_123/kmc.pkl"
+  }
+}

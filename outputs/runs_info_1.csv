@@ -1,0 +1,5 @@
+run_id,size_x,size_y,n_seeds,seed_density_ref,csv_path,run_dir
+size_70x70_run_001_seed_123,70,70,100,0.02040816326530612,outputs/size_70x70_run_001_seed_123/conversion_history.csv,outputs/size_70x70_run_001_seed_123
+size_75x75_run_002_seed_123,75,75,115,0.02040816326530612,outputs/size_75x75_run_002_seed_123/conversion_history.csv,outputs/size_75x75_run_002_seed_123
+size_80x80_run_003_seed_123,80,80,131,0.02040816326530612,outputs/size_80x80_run_003_seed_123/conversion_history.csv,outputs/size_80x80_run_003_seed_123
+size_85x85_run_004_seed_123,85,85,147,0.02040816326530612,outputs/size_85x85_run_004_seed_123/conversion_history.csv,outputs/size_85x85_run_004_seed_123
