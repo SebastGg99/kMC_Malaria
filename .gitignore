@@ -10,3 +10,5 @@ data/
 # Ignorar __pycache__ en cualquier directorio del proyecto
 __pycache__/
 *.pyc
+
+.descartables/*
