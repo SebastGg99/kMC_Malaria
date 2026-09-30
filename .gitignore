@@ -2,7 +2,7 @@
 venv/
 
 # Ignorar carpeta de configuración de GitHub y acciones
-#.github/
+.github/
 
 # Ignorar carpeta de datos
 data/
@@ -12,3 +12,17 @@ __pycache__/
 *.pyc
 
 .descartables/*
+
+.gitignore
+
+.claude/
+
+CLAUDE.md
+
+auditoria.md
+
+Plan_kMC_SOS.md
+
+Plan_Paper.md
+
+propuesta_refac.md

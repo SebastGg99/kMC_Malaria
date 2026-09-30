@@ -1,0 +1,35 @@
+{
+  "description": "Corrida única anisotrópica con figuras. Parámetros de src/pRunAni.py.",
+  "source_script": "src/pRunAni.py",
+  "engine": "static",
+  "params": {
+    "K0_plus": 0.2116718,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT_x": 1.2704636027368605,
+    "E_pb_over_kT_y": 2.2704636027368603,
+    "phi_over_kT": 1.379247801207933,
+    "delta_x": 0.3,
+    "delta_y": 1.0,
+    "V": 1,
+    "C_eq": 15.0,
+    "fixed_sigma": 1,
+    "S_floor": -5.0,
+    "S_ceil": 9.0
+  },
+  "lattice": {
+    "seed": 42,
+    "init_mode": "flat",
+    "init_kwargs": {
+      "max_height": 1
+    }
+  },
+  "engine_kwargs": {
+    "N_bulk0": 2000,
+    "rng_seed": 123,
+    "time_scale": 10,
+    "constant_concentration": true
+  },
+  "n_seeds": 10,
+  "seed_scaling": "fixed",
+  "plot_style": "v2"
+}

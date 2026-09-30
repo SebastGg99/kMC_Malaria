@@ -1,0 +1,28 @@
+{
+  "description": "Barrido isotrópico, red inicial aleatoria (con 'random' --n-seeds no tiene efecto). Parámetros de src/isotropicRun_v2.py.",
+  "source_script": "src/isotropicRun_v2.py",
+  "engine": "static",
+  "params": {
+    "K0_plus": 11.6718,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT_x": 1.2704636027368605,
+    "E_pb_over_kT_y": 1.2704636027368605,
+    "phi_over_kT": 1.4792478012079329,
+    "delta_x": 1.7789686274068774,
+    "delta_y": 1.7789686274068774,
+    "V": 1,
+    "C_eq": 15.0,
+    "S_floor": -5.0,
+    "S_ceil": 9.0
+  },
+  "lattice": {
+    "init_mode": "random",
+    "init_kwargs": {
+      "max_height": 1
+    }
+  },
+  "engine_kwargs": {
+    "N_bulk0": 2000,
+    "constant_concentration": true
+  }
+}

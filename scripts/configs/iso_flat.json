@@ -1,0 +1,28 @@
+{
+  "description": "Barrido isotrópico, red plana. Parámetros de src/isotropicRun.py (estado actual del archivo).",
+  "source_script": "src/isotropicRun.py",
+  "engine": "static",
+  "params": {
+    "K0_plus": 0.2116718,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT_x": 1.2704636027368605,
+    "E_pb_over_kT_y": 1.2704636027368605,
+    "phi_over_kT": 1.4792478012079329,
+    "delta_x": 1.3,
+    "delta_y": 1.3,
+    "V": 1,
+    "C_eq": 15.0,
+    "S_floor": -5.0,
+    "S_ceil": 9.0
+  },
+  "lattice": {
+    "init_mode": "flat",
+    "init_kwargs": {
+      "max_height": 1
+    }
+  },
+  "engine_kwargs": {
+    "N_bulk0": 2000,
+    "constant_concentration": true
+  }
+}

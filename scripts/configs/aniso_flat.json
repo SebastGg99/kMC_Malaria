@@ -1,0 +1,28 @@
+{
+  "description": "Barrido anisotrópico, red plana. Parámetros de src/anisotropicRun.py (coinciden con results/outputs_aniso_3).",
+  "source_script": "src/anisotropicRun.py",
+  "engine": "static",
+  "params": {
+    "K0_plus": 0.516718,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT_x": 0.76085943,
+    "E_pb_over_kT_y": 2.19936039,
+    "phi_over_kT": 1.4792478012079329,
+    "delta_x": 0.3,
+    "delta_y": 1.7789686274068774,
+    "V": 1,
+    "C_eq": 15.0,
+    "S_floor": -5.0,
+    "S_ceil": 9.0
+  },
+  "lattice": {
+    "init_mode": "flat",
+    "init_kwargs": {
+      "max_height": 1
+    }
+  },
+  "engine_kwargs": {
+    "N_bulk0": 2000,
+    "constant_concentration": true
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "description": "Línea DINÁMICA. Parámetros de notebooks/final_results.ipynb, celdas 38-41 (kmc_1: 70x70, N=3000, t_s=1200, n_s=100).",
+  "source_script": "notebooks/final_results.ipynb",
+  "engine": "dynamic",
+  "params": {
+    "T": 300,
+    "K0_plus": 11.671806264584635,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT": 1.2704636027368605,
+    "phi_over_kT": 1.4792478012079329,
+    "delta": 1.7789686274068774,
+    "V": 0.9943756704678864,
+    "C_eq": 6.66285823642452,
+    "S_floor": -5.0,
+    "S_ceil": 8.0
+  },
+  "lattice": {
+    "seed": 25,
+    "init_mode": "flat",
+    "init_kwargs": {}
+  },
+  "engine_kwargs": {
+    "N_bulk0": 3000,
+    "rng_seed": 123,
+    "time_scale": 1200
+  },
+  "n_seeds": 100,
+  "seed_scaling": "fixed",
+  "plot_style": "classic"
+}

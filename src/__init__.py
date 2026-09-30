@@ -1,51 +1,75 @@
-from params import KMCParams
-from lattice import LatticeSOS
-from bkl import KMC_BKL, SelectiveKMC, KMC_NoDesNoMig
-from plotter import Plotter
-from params_v2 import KMCParams_v2
-from lattice_v2 import LatticeSOS_v2
-from bkl_v2 import KMC_BKL_v2
-from probabilityAnalysis import compute_probabilities, extract_probs
-from plotter_v2 import Plotter_v2
-from utils import _safe_exp, _finite_or_zero
-from model2D_v2 import Params2D as Params2D_v2, KMC2D as KMC2D_v2, KMC2DVisualizer as KMC2DVisualizer_v2
-from utils_v2 import count_bonds_xy
-from params_v3 import KMCParams_v3
-from lattice_v3 import LatticeSOS_v3
-from bkl_v3 import KMC_BKL_v3, SelectiveKMC_v3, KMC_NoDesNoMig_v3
-from bkl_v4 import KMC_BKL_v4
-from lattice_v4 import LatticeSOS_v4
-from params_v4 import KMCParams_v4
-from bkl_v5 import KMC_BKL_v5
-from plotter_v3 import Plotter_v3
+"""Paquete kMC-BKL-SOS con dos líneas de motor.
 
-__all__ = ['KMCParams',
-           'LatticeSOS',
-           'KMC_BKL',
-           'SelectiveKMC',
-           'KMC_NoDesNoMig',
-           'Plotter',
-           'KMCParams_v2',
-        #    'LysozymeParams_v2',
-           'LatticeSOS_v2',
-           'KMC_BKL_v2',
-           'compute_probabilities',
-           'extract_probs',
-           'Plotter_v2',
-           '_safe_exp',
-           '_finite_or_zero',
-           'Params2D_v2',
-           'KMC2D_v2',
-           'KMC2DVisualizer_v2',
-           'count_bonds_xy',
-           'KMCParams_v3',
-           'LatticeSOS_v3',
-           'KMC_BKL_v3',
-           'SelectiveKMC_v3',
-           'KMC_NoDesNoMig_v3',
-           'KMC_BKL_v4',
-           'LatticeSOS_v4',
-           'KMCParams_v4',
-           'KMC_BKL_v5',
-           'Plotter_v3',
-           ]
+- `src.dynamic`: concentración dinámica (origen: bkl.py, lattice.py, params.py)
+- `src.static`:  sobresaturación fija / concentración constante, anisotropía x/y,
+                 solvente e incorporación (origen: bkl_v4.py + opciones de bkl_v5.py,
+                 lattice_v3.py, params_v4.py)
+- `src.common`:  numérica, datos de referencia, observables, E/S y pickles antiguos
+- `src.plotting`: Plotter unificado (estilos "classic", "v2", "academic", "paper")
+
+Imports relativos: basta con que la carpeta que CONTIENE `src/` esté en sys.path
+(antes hacía falta añadir `src/` misma).
+
+Los nombres heredados (KMC_BKL, KMC_BKL_v4, Plotter_v2, ...) se exportan como alias
+durante la transición para que los notebooks sigan funcionando con `from src import *`.
+"""
+
+# ---- Nombres canónicos ----
+from .dynamic import (
+    KMCParamsDynamic,
+    LatticeSOSDynamic,
+    KMC_BKL_Dynamic,
+    SelectiveKMC_Dynamic,
+    KMC_NoDesNoMig_Dynamic,
+)
+from .static import (
+    KMCParamsStatic,
+    LatticeSOSStatic,
+    KMC_BKL_Static,
+    SelectiveKMC_Static,
+    KMC_NoDesNoMig_Static,
+)
+from .plotting import Plotter, Plotter_v2, Plotter_v3
+from .common import (
+    _safe_exp,
+    _finite_or_zero,
+    FACE_DATA,
+    mean_height,
+    roughness,
+    step_density,
+    count_by_coordination,
+    load_legacy_pickle,
+)
+
+# ---- Alias heredados: línea dinámica (bkl.py / lattice.py / params.py) ----
+KMCParams = KMCParamsDynamic
+LatticeSOS = LatticeSOSDynamic
+KMC_BKL = KMC_BKL_Dynamic
+SelectiveKMC = SelectiveKMC_Dynamic
+KMC_NoDesNoMig = KMC_NoDesNoMig_Dynamic
+
+# ---- Alias heredados: línea estática (bkl_v4.py / lattice_v3.py / params_v4.py) ----
+KMCParams_v4 = KMCParamsStatic
+LatticeSOS_v3 = LatticeSOSStatic
+LatticeSOS_v4 = LatticeSOSStatic
+KMC_BKL_v4 = KMC_BKL_Static
+SelectiveKMC_v4 = SelectiveKMC_Static
+KMC_NoDesNoMig_v4 = KMC_NoDesNoMig_Static
+# KMC_BKL_v5 no se exporta: no tenía consumidores. Equivalente:
+#   KMC_BKL_Static(..., record_adsorption_probs=False) + kmc.crystal_fraction_percent
+
+__all__ = [
+    # canónicos
+    "KMCParamsDynamic", "LatticeSOSDynamic", "KMC_BKL_Dynamic",
+    "SelectiveKMC_Dynamic", "KMC_NoDesNoMig_Dynamic",
+    "KMCParamsStatic", "LatticeSOSStatic", "KMC_BKL_Static",
+    "SelectiveKMC_Static", "KMC_NoDesNoMig_Static",
+    "Plotter", "Plotter_v2", "Plotter_v3",
+    "_safe_exp", "_finite_or_zero", "FACE_DATA",
+    "mean_height", "roughness", "step_density", "count_by_coordination",
+    "load_legacy_pickle",
+    # alias heredados
+    "KMCParams", "LatticeSOS", "KMC_BKL", "SelectiveKMC", "KMC_NoDesNoMig",
+    "KMCParams_v4", "LatticeSOS_v3", "LatticeSOS_v4", "KMC_BKL_v4",
+    "SelectiveKMC_v4", "KMC_NoDesNoMig_v4",
+]

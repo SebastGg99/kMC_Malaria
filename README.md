@@ -1,120 +1,335 @@
-# MalariaProject
+# kMC_Malaria: crecimiento de cristales de hemozoína con kMC-SOS
 
-## Descripción General
+Simulación **Kinetic Monte Carlo (kMC)** del crecimiento de cristales de hemozoína
+(biomineral relacionado con la malaria). La superficie se modela con la aproximación
+**Solid-On-Solid (SOS)** sobre una red cuadrada con condiciones de contorno periódicas,
+y la evolución temporal usa el algoritmo **BKL** (Bortz-Kalos-Lebowitz, "n-fold way",
+sin rechazo). Hay dos líneas de motor:
 
-Este repositorio contiene una implementación robusta de una simulación **Kinetic Monte Carlo (kMC)** aplicada al estudio de la cinética de crecimiento de cristales de Hemozoína. El software modela la superficie del cristal utilizando una aproximación **Solid-On-Solid (SOS)** sobre una red cuadrada con condiciones de contorno periódicas.
+- **Línea dinámica** (`src.dynamic`): el reservorio se agota y la sobresaturación
+  S = ln(C/C_eq) baja con el tiempo. Isotrópica.
+- **Línea estática** (`src.static`): σ fija o concentración constante, con
+  anisotropía x/y y factores de solvente. Generó todas las corridas de `results/`.
 
-El núcleo de la simulación utiliza el **algoritmo BKL (Bortz-Kalos-Lebowitz)**, también conocido como "n-fold way" o algoritmo libre de rechazo, para garantizar una evolución temporal eficiente y exacta del sistema estocástico.
+Para empezar, abre `notebooks/ejemplo_linea_estatica.ipynb` y
+`notebooks/ejemplo_linea_dinamica.ipynb`: recorren el uso completo de cada línea.
 
-## Estructura del Código Fuente (`src/`)
+**Estado de la refactorización:** hecha y verificada en `refac/` (2026-09-26) y
+promovida a la raíz del repositorio (2026-09-29, §7). Nada se borró: el código, los
+tests y los documentos anteriores están en `.descartables/pre_refactor/`.
+**Base:** `auditoria.md` y `propuesta_refac.md`, con las decisiones del autor:
 
-El código está estructurado de manera modular para separar la física del sistema, la topología de la red y la lógica del algoritmo estocástico.
+| # | Decisión | Aplicada como |
+|---|---|---|
+| D1 | Líneas según la tabla recomendada | Dinámica = `bkl.py` + `lattice.py` + `params.py`; estática = `bkl_v4.py` + `lattice_v3.py` + `params_v4.py` |
+| D2 | Integrar v5 en el motor estático | Opciones de `bkl_v5` dentro de `KMC_BKL_Static`, con valores por defecto iguales a v4 |
+| D3 | Nombres canónicos | `KMC_BKL_Dynamic`/`KMC_BKL_Static`, etc., más alias heredados (§3) |
+| D4 | Estructura en subpaquetes | `src/{common,dynamic,static,plotting}` |
+| D5 | Modo dinámico del motor estático tal cual, "no validado" | Sin cambios de código; documentado en `src/static/engine.py` |
+| D6 | Descartar `model2D` | No está en `src/`; sigue en `.descartables/scripts/` (ver el efecto en §6) |
+| D7 | Archivar `growthRate.py` y `probabilityAnalysis.py` | Copias sin modificar en `archive/` |
+| D8 | Dejar `.descartables/` y mover lo propuesto | Todo lo reemplazado se **movió** a `.descartables/pre_refactor/` (§7); nada se borró |
 
-### 1. `lattice.py`: Topología y Estado de la Superficie
-Contiene la clase [`LatticeSOS`](src/lattice.py#L4). Esta clase gestiona el estado geométrico del cristal representando la superficie como una matriz de alturas enteras bajo el modelo **Solid-On-Solid (SOS)**.
+---
 
-**Inicialización:**
-*   [`__init__(size, seed, debug)`](src/lattice.py#L10): Constructor que crea una red cuadrada vacía de tamaño `size` y establece el generador de números aleatorios.
-*   [`initialize(init_mode, max_roughness)`](src/lattice.py#L19): Configura la topografía inicial de la superficie (plana o rugosa aleatoria).
+## 1. Estructura
 
-**Topología:**
-*   [`wrap(idx)`](src/lattice.py#L31): Aplica condiciones de contorno periódicas para asegurar la continuidad de la red en los bordes.
-*   [`neighbors4(site)`](src/lattice.py#L36): Retorna las coordenadas de los 4 vecinos más cercanos (vecindad de von Neumann) respetando las condiciones periódicas.
-*   [`get_sites()`](src/lattice.py#L129): Devuelve una lista con las coordenadas de todos los sitios de la red.
+```
+kMC_Malaria/
+├── src/
+│   ├── __init__.py            API pública: nombres canónicos + alias heredados
+│   ├── common/
+│   │   ├── numerics.py        _safe_exp, _finite_or_zero                  ← utils.py
+│   │   ├── reference_data.py  FACE_DATA (única copia)                     ← utils.py
+│   │   ├── observables.py     mean_height, roughness, step_density,
+│   │   │                      count_by_coordination                       ← lattice_v2.py
+│   │   ├── io.py              save/load, conversion_history, load_run,
+│   │   │                      rebuild_from_metadata, git_commit           ← *Run.py, notebooks
+│   │   ├── cli.py             parse_times, parse_sigma_range, ...         ← 7 scripts
+│   │   └── legacy.py          load_legacy_pickle (kmc.pkl antiguos)
+│   ├── dynamic/               params.py ← params.py (.descartables) · lattice.py ← lattice.py
+│   │                          engine.py ← bkl.py
+│   ├── static/                params.py ← params_v4.py · lattice.py ← lattice_v3.py
+│   │                          engine.py ← bkl_v4.py (+ opciones de bkl_v5.py)
+│   └── plotting/plotter.py    Plotter(style=classic|v2|academic|paper) ← plotter.py + plotter_v2.py + plotter_v3.py
+│                              (paper: nuevo, paleta azul/rojo de la Fig. 9 de Nagpal et al. 2024)
+├── scripts/
+│   ├── run_sigma_scan.py      ← isotropicRun.py, isotropicRun_v2.py, anisotropicRun.py
+│   ├── run_single.py          ← pRun.py, pRunAni.py, pRun_v2.py, pRun_v3.py (+ línea dinámica)
+│   ├── reproduce_results.py   reproduce o verifica las 38 corridas de results/
+│   ├── build_results_configs.py  genera configs/results/*.json
+│   └── configs/               un JSON por variante que antes era un script clonado
+│       ├── iso_flat.json, iso_random.json, aniso_flat.json            (barridos de σ)
+│       ├── single_iso.json, single_aniso.json                          (pRun, pRunAni)
+│       ├── sizes_fixed_seeds.json, sizes_density_seeds.json            (pRun_v2, pRun_v3)
+│       ├── dynamic_final_results.json                                  (línea dinámica)
+│       └── results/outputs_*.json   especificación reconstruida de cada carpeta de results/
+├── notebooks/                 ejemplo_linea_estatica.ipynb, ejemplo_linea_dinamica.ipynb
+│                              (uso completo de cada línea + comprobaciones de invariantes)
+│                              + notebooks de análisis: final_results, morphologies, results_1 (§6)
+├── tests/                     ver §2
+├── archive/                   growthRate.py, probabilityAnalysis.py (D7) + README
+├── requirements.txt           numpy 2.5.3, pandas 3.0.6, matplotlib 3.11.2
+├── results/, outputs/         corridas históricas (versionadas en git)
+├── references/                artículos de referencia (Nagpal et al. 2024, ...)
+├── docs/                      documentación Sphinx (describe aún la estructura antigua)
+├── auditoria.md, propuesta_refac.md, Plan_Paper.md, Plan_kMC_SOS.md
+└── .descartables/             código y notebooks descartados (ignorado por git, §7)
+    ├── pre_refactor/          src/, tests/ y documentos raíz anteriores a la promoción
+    ├── scripts/               model2D*.py y versions/ (bkl_v2, params.py, plotter_v2, ...)
+    ├── notebooks/             notebooks antiguos
+    └── figures/               figuras sueltas que estaban en la raíz
+```
 
-**Manipulación de Estado:**
-*   [`get_height(site)`](src/lattice.py#L44): Retorna la altura actual de una columna.
-*   [`inc_height(site, dh)`](src/lattice.py#L47): Incrementa la altura de un sitio, simulando un evento de deposición o adsorción.
-*   [`dec_height(site, dh)`](src/lattice.py#L53): Decrementa la altura de un sitio, simulando un evento de desorción. Incluye validaciones para evitar alturas negativas.
+Tamaño:
+- motor + plotters + utilidades: 13 archivos y 3379 líneas → 17 archivos pequeños y
+  2930 líneas;
+- scripts de ejecución: 7 archivos y 2554 líneas → 2 scripts y 414 líneas, más
+  2 utilidades nuevas de reproducción.
 
-**Cálculo de Enlaces y Coordinación:**
-*   [`lateral_neighbors_at_level(site, level)`](src/lattice.py#L62): Método auxiliar que cuenta cuántos vecinos alcanzan al menos cierta altura `level`. Usado para calcular energías.
-*   [`adsorption_bonds(site)`](src/lattice.py#L76): Calcula cuántos vecinos laterales tendría una partícula si se adsorbiera en el sitio. Determina la estabilidad de llegada.
-*   [`desorption_bonds(site)`](src/lattice.py#L89): Calcula cuántos vecinos laterales vinculan a la partícula en el tope de la columna. Determina la barrera energética para la desorción.
-*   [`migration_targets(site)`](src/lattice.py#L105): Identifica a qué sitios vecinos puede moverse una partícula (donde la altura destino $\le$ altura origen), gobernando la difusión superficial.
+---
 
-### 2. `params.py`: Parámetros Fisicoquímicos
-Define la `dataclass` [`KMCParams`](src/params.py#L4), que actúa como contenedor inmutable para los parámetros de la simulación. Su diseño facilita la configuración centralizada de la física del experimento.
+## 2. Verificación
 
-**Parámetros Termodinámicos y Ambientales:**
-*   [`T`](src/params.py#L5): Temperatura absoluta del sistema.
-*   [`V`](src/params.py#L12): Volumen de la solución circundante. Fundamental para la variación dinámica de la concentración.
-*   [`C_eq`](src/params.py#L13): Concentración de equilibrio del soluto. Base para el cálculo de la supersaturación ($S$).
+Resultados de la ejecución del 2026-09-26 en `refac/` (Python 3.12.3, numpy 2.5.3, en
+un entorno temporal). La promoción a la raíz (§7) solo movió archivos y ajustó rutas;
+**la batería no se ha vuelto a ejecutar desde la raíz** (ver §7.3).
 
-**Parámetros Cinéticos (Arrhenius):**
-*   [`K0_plus`](src/params.py#L6): Factor pre-exponencial cinético base para eventos reversibles (adsorción, desorción, migración).
-*   [`K_inc_plus`](src/params.py#L7): Factor pre-exponencial específico para el evento de incorporación irreversible.
-*   [`E_pb_over_kT`](src/params.py#L8): Energía por enlace lateral (partícula-partícula) normalizada por $k_B T$. Controla la cooperatividad.
-*   [`phi_over_kT`](src/params.py#L9): Energía de activación de difusión base (potencial de superficie) normalizada por $k_B T$.
-*   [`delta`](src/params.py#L10): Parámetro de ajuste que modula la dependencia de la tasa de adsorción respecto a la supersaturación.
+| Test | Qué comprueba | Resultado |
+|---|---|---|
+| `test_golden.py` | 19 casos (8 dinámicos, 11 estáticos: σ fija, concentración constante, modo dinámico, inicio `random`/`seeds`/`screw`, solvente, subclases) ejecutados con el código **original** (`make_golden.py`) y con el refactorizado | **Idénticos bit a bit**: alturas, tiempos, historial, contadores, historias y snapshots |
+| `test_golden.py` (v5) | `record_adsorption_probs=False` da la misma trayectoria; `crystal_fraction_percent` == `conversion_percent` de `bkl_v5` original | OK |
+| `test_legacy_pickles.py` | Los **38** `kmc.pkl` de `results/` cargan y coinciden con su `snaps.pkl`/`stats.pkl` | OK (antes era imposible, ver §4.1) |
+| `test_results_reproduction.py` | Las **38** corridas de `results/` se regeneran: los primeros 150 eventos de cada una coinciden con el historial guardado (evento y sitio exactos; tiempo con rtol 1e-12) | OK |
+| `test_plotter.py` | PNG de `plot_crystal_3d` (5 combinaciones estilo/modo) y GIF (4) frente a los 3 plotters originales | **PNG idénticos píxel a píxel; GIF idénticos byte a byte** |
+| `test_scripts.py` | `run_sigma_scan` frente al flujo de `anisotropicRun.py` con módulos originales; `rebuild_from_metadata`; `run_single` (estático, varios tamaños, dinámico) | OK |
+| `dynamic/`, `static/`, `test_numerics.py` | Tests antiguos portados y tests **nuevos** de la línea estática (antes no tenía) | 29 tests OK |
 
-**Límites de Seguridad Numérica:**
-*   [`S_floor`](src/params.py#L14): Límite inferior (suelo) para la supersaturación, evitando inestabilidades en regímenes de disolución rápida.
-*   [`S_ceil`](src/params.py#L15): Límite superior (techo) para la supersaturación, previniendo tasas de adsorción numéricamente explosivas.
+Cómo ejecutarlos (desde la raíz del repositorio):
 
-### 3. `bkl.py`: Motor de Simulación (Algoritmo BKL)
-Contiene la clase [`KMC_BKL`](src/bkl.py#L11), que orquesta la evolución temporal del sistema.
+```bash
+python -m unittest discover -s tests -t .          # todo (~4 min)
+KMC_REPRO_EVENTS=50 python -m unittest tests.test_results_reproduction   # más rápido
+```
 
-**Configuración y Estado:**
-*   [`__init__(lattice, params, N_bulk0, ...)`](src/bkl.py#L12): Inicializa la simulación inyectando la red, los parámetros físicos y la cantidad de soluto inicial. Configura las semillas del cristal si es necesario.
-*   [`supersaturación`](src/bkl.py#L48): Propiedad que calcula dinámicamente la fuerza impulsora termodinámica ($S$) basada en la concentración actual de soluto.
-*   [`conversion_percent`](src/bkl.py#L55): Propiedad que monitorea el progreso de la cristalización (porcentaje de soluto convertido en cristal).
+- Las referencias golden solo valen con numpy 2.5.3 (`tests/golden/ENV.txt`). Con
+  otra versión, `test_golden` se omite y hay que regenerarlas con
+  `python tests/make_golden.py`, que ejecuta el código original de
+  `.descartables/pre_refactor/src/`.
+- `test_plotter`, `test_golden` (parte de v5) y `test_scripts` (paridad) usan los
+  módulos originales de `.descartables/pre_refactor/src/` y
+  `.descartables/scripts/versions/` (`tests/_paths.py`); se omiten solos si no están.
+- El `.env/` local es Python 3.14.4 con numpy 2.5.3 y matplotlib 3.11.2, pero **sin
+  pandas** (lo usan `test_scripts`, `scripts/` y los notebooks de análisis).
 
-**Cálculo de Tasas (Rates):**
-Implementación de las ecuaciones de Arrhenius para cada proceso elemental:
-*   [`r_a(i)`](src/bkl.py#L63): Tasa de **Adsorción**. Depende de $S$ y se ajusta por la depleción del soluto en el 'bulk'.
-*   [`r_d(i)`](src/bkl.py#L75): Tasa de **Desorción**. Depende fuertemente del número de vecinos laterales `i`.
-*   [`r_m(i)`](src/bkl.py#L80): Tasa de **Migración**. Difusión superficial térmica.
-*   [`r_inc(i)`](src/bkl.py#L85): Tasa de **Incorporación**. Evento de crecimiento irreversible.
+---
 
-**Algoritmo BKL (Clasificación y Selección):**
-El corazón del método "rejection-free" o n-fold way:
-*   **Clasificadores**: Agrupan los sitios de la red según su entorno local para evitar recalcular tasas idénticas.
-    *   [`_classify_adsorption_sites()`](src/bkl.py#L91): Clasifica todos los sitios donde puede ocurrir adsorción.
-    *   [`_classify_desorption_sites()`](src/bkl.py#L98): Clasifica sitios ocupados susceptibles a desorber.
-    *   [`_classify_migration_sites()`](src/bkl.py#L106): Clasifica sitios móviles que tienen destinos válidos.
-    *   [`_classify_incorporation_sites()`](src/bkl.py#L117): Clasifica sitios candidatos para incorporación permanente.
-*   **Selectores Monte Carlo**:
-    *   [`_choose_event_type(...)`](src/bkl.py#L127): Elige qué tipo de evento físico ocurre (ads/des/mig/inc) proporcional a sus tasas totales $W$.
-    *   [`_choose_class(weights)`](src/bkl.py#L139): Elige la clase de coordinación específica dentro del evento seleccionado.
-    *   [`_choose_site_uniform(sites)`](src/bkl.py#L153): Elige al azar un sitio específico dentro de la clase ganadora.
+## 3. Uso
 
-**Ejecución y Control:**
-*   [`step()`](src/bkl.py#L189): Ejecuta un único paso de Monte Carlo: calcula tasas totales, avanza el tiempo estocásticamente, selecciona y ejecuta el evento, y actualiza la red. Incluye verificaciones de integridad si `debug=True`.
-*   [`run(t_end, snapshot_times, max_events)`](src/bkl.py#L292): Bucle principal que itera llamadas a `step()` hasta cumplir la condición de parada. Gestiona la grabación de "snapshots" del estado del sistema en tiempos específicos.
-*   [`_validate_integrity()`](src/bkl.py#L158): (Modo Debug) Auditoría exhaustiva que verifica consistencia matemática y física (sin tasas negativas, conservación de sitios, termodinámica).
+```python
+import sys; sys.path.insert(0, "/home/sggphysics/kMC_Malaria")   # la carpeta que CONTIENE src/
+from src import *
 
-**Visualización:**
-*   [`plot_crystal_3d(...)`](src/bkl.py#L327): Genera visualizaciones 3D del cristal utilizando `matplotlib`. Soporta modo superficie continua (`mode="surface"`) o visualización de voxeles (`mode="voxel"`).
+# Línea estática (nombres canónicos)
+lat = LatticeSOSStatic(size=(80, 80), seed=42); lat.initialize(mode="flat", max_height=1)
+kmc = KMC_BKL_Static(lattice=lat, params=KMCParamsStatic(...), N_bulk0=2000, rng_seed=123,
+                     time_scale=70, record_adsorption_probs=False)   # 1.8-2x más rápido (medido)
+snaps, stats = kmc.run(t_end=5, snapshot_times=np.arange(0, 5.5, 0.5))
+Plotter(kmc, style="v2").plot_crystal_3d(snapshots=snaps)
 
-### 4. `utils.py`: Estabilidad Numérica
-Provee funciones auxiliares para el manejo robusto de operaciones de punto flotante:
-*   [`_safe_exp()`](src/utils.py#L9): Evita desbordamientos (*overflow*) en cálculos exponenciales de Arrhenius clamping de argumentos.
-*   [`_finite_or_zero()`](src/utils.py#L16): Sanitiza los resultados para evitar la propagación de valores `NaN` o `Inf` en las tasas de reacción.
+# Cargar una corrida antigua (ahora sí funciona kmc.pkl)
+from src.common.io import load_run
+run = load_run("results/outputs_aniso_3/size_80x80_sigma_0.3_seed_123", load_kmc=True)
+```
 
-### 5. Sistema de Auditoría y Modo Debug (`debug=True`)
-El código implementa un sistema de **Programación Defensiva** activable mediante el flag `debug=True` en los constructores de `LatticeSOS` y `KMC_BKL`. Este modo sacrifica rendimiento a cambio de garantías estrictas de corrección física y matemática paso a paso. Las pruebas internas incluyen:
+**Alias heredados**, para que los notebooks no tengan que cambiar:
+- `KMC_BKL`, `KMCParams`, `LatticeSOS`, `SelectiveKMC`, `KMC_NoDesNoMig` → línea
+  dinámica;
+- `KMC_BKL_v4`, `KMCParams_v4`, `LatticeSOS_v4`, `LatticeSOS_v3`, `SelectiveKMC_v4`,
+  `KMC_NoDesNoMig_v4` → línea estática;
+- `Plotter`, `Plotter_v2`, `Plotter_v3` → `Plotter` con estilo `classic`/`v2`/`academic`.
+  El estilo `paper` (azul = capa completa, rojo = capa en crecimiento) es nuevo.
 
-#### A. Validez Física (Physical Sanity)
-*   **Geometría SOS**: Se verifica en cada operación de la red que no se violen las restricciones del modelo Solid-On-Solid. Por ejemplo, se asegura que las alturas nunca sean negativas y que la migración superficial respete la gravedad (las partículas no pueden "levitar" o subir a un sitio más alto sin un evento de desorción previo).
-    *   *Ubicación*: [`LatticeSOS.inc_height`](src/lattice.py#L47), [`LatticeSOS.dec_height`](src/lattice.py#L53), [`LatticeSOS.migration_targets`](src/lattice.py#L105).
+`KMC_BKL_v5` no se exporta porque no tenía consumidores. Su equivalente es
+`KMC_BKL_Static(..., record_adsorption_probs=False)` junto con
+`kmc.crystal_fraction_percent`.
 
-#### B. Integridad de Contenedores (Binning Integrity)
-*   **Conservación de Sitios**: El algoritmo BKL depende de clasificar cada sitio de la red en listas (bins) según su coordinación. En modo debug, el método [`_validate_integrity`](src/bkl.py#L160) recalcula el conteo total de sitios en estas listas y verifica que coincida exactamente con el tamaño de la red ($N \times N$). Esto detecta "fugas" de sitios donde una partícula podría perderse del sistema de simulación.
+Scripts (desde la raíz del repositorio):
 
-#### C. Sanidad de Tasas (Rate Sanity)
-*   **Estabilidad Numérica**: Se comprueba exhaustivamente que todas las tasas de transición calculadas ($r_a, r_d, r_m, r_{inc}$) sean valores finitos y no negativos para todas las configuraciones posibles de vecinos (0-4). Esto previene la propagación silenciosa de `NaN` (Not a Number) o valores infinitos que colapsarían la simulación pasos más adelante.
+```bash
+python scripts/run_sigma_scan.py --config scripts/configs/aniso_flat.json --times 0:5.5:0.5 \
+    --size 80 80 --n-seeds 100 --fixed-sigma 0.3 0.7 --sigma-step 0.1 --time-scale 70 \
+    --output-dir outputs_aniso_new [--no-adsorption-probs] [--no-kmc-pickle]
+python scripts/run_single.py --config scripts/configs/single_iso.json --times 0:8:1 --size 10 10 --gif
+python scripts/reproduce_results.py --folder outputs_aniso_3 --check 300
+```
 
-#### D. Garantía de Determinismo
-*   **Seed Check**: Para asegurar que cualquier error sea reproducible, el modo debug exige explícitamente que se proporcione una semilla (`rng_seed`) al generador de números aleatorios. Si no se provee, la inicialización falla preventivamente.
+---
 
-#### E. Chequeo Termodinámico (Detailed Balance Check)
-*   **Micro-reversibilidad**: Cerca del equilibrio termodinámico (sobresaturación $S \approx 0$), las tasas globales de adsorción y desorción deben ser comparables. El sistema monitorea si existe una discrepancia de órdenes de magnitud injustificada entre $W_{ads}$ y $W_{des}$ en esta región, lo cual indicaría una violación de las leyes de la termodinámica (como la creación de energía libre de la nada).
+## 4. Hallazgos nuevos durante la refactorización (no estaban en la auditoría)
 
-## Flujo de Ejecución
+### 4.1 Los 38 `kmc.pkl` nunca se pudieron cargar
 
-El flujo típico de una simulación implica:
-1.  Instancia de `LatticeSOS` e inicialización de la superficie (plana o rugosa).
-2.  Definición de `KMCParams` con las condiciones físicas del experimento.
-3.  Inicialización de `KMC_BKL` inyectando la red y los parámetros.
-4.  Ejecución del bucle principal mediante `run()`, que itera sobre los pasos de Monte Carlo hasta alcanzar el tiempo final, registrando la historia de eventos y generando "snapshots" de la superficie.
+`_LatticeSize` (en `lattice.py` y `lattice_v3.py`) es una subclase de `tuple` con
+`__new__(cls, nx, ny)`. Pickle la reconstruye llamando a `__new__(cls, (nx, ny))` con
+un solo argumento, así que `pickle.load` falla con `TypeError` **incluso con el código
+original**; lo comprobé con `src/` en `sys.path`. Son unos 870 MB de archivos que no se
+podían abrir. Esto probablemente explica por qué los notebooks reconstruyen el objeto
+desde `metadata.json`.
+
+**Corrección** en las dos redes refactorizadas: `__new__` acepta también la tupla. No
+afecta a la simulación: los tests golden siguen idénticos.
+
+### 4.2 `n_seeds` de metadata.json no se aplicó en la mayoría de corridas
+
+El primer snapshot de 30 de las 38 corridas tiene **una sola partícula**, aunque su
+metadata dice `n_seeds=100` o `500`. Las corridas se reproducen evento a evento **solo
+si se simulan sin semillas**. El código que las generó no sembraba, aunque el
+`bkl_v4.py` actual sí lo haría.
+
+La metadata tampoco guardaba el modo de inicio. Deducido de los datos y verificado por
+reproducción:
+
+| Carpeta | Corridas | Inicio efectivo | Semillas efectivas | time_scale | K0 |
+|---|---|---|---|---|---|
+| `outputs_aniso` | σ 0.4–0.7 / σ 1–7 | flat | 0 (metadata: 500) | 70 / **100** | 1.16718 / **11.6718** |
+| `outputs_aniso_2` | 4 | flat | 0 (metadata: 500) | 70 | 11.6718 |
+| `outputs_aniso_3` | 5 | flat | 0 (metadata: 100) | 70 | 0.516718 |
+| `outputs_iso` | σ 0.4–0.7 / σ 1–6 | flat / **seeds (isla compacta de 500)** | 0 / 500 | 70 / **80** | 1.16718 / **0.2116718** |
+| `outputs_iso_2` | 4 | flat | 0 (metadata: 500) | 100 | 11.6718 |
+| `outputs_iso_3` | 5 | flat | 0 (metadata: 100) | 70 | 0.5116718 |
+| `outputs_iso_4` | 2 | **random** | — | 110 | 11.6718 |
+
+Consecuencias:
+- `outputs_aniso` y `outputs_iso` **mezclan corridas con distinto K0, `time_scale` e
+  inicio** en la misma carpeta. Al compararlas como una sola serie se mezclan
+  condiciones distintas.
+- La tabla de `auditoria.md` §6 solo miraba la primera corrida de cada carpeta; esta
+  tabla la corrige.
+- `rebuild_from_metadata` con metadata antigua reconstruye mal estas corridas, porque
+  sembraría `n_seeds`. Para reproducirlas hay que usar
+  `scripts/configs/results/*.json` con `reproduce_results.py`.
+
+### 4.3 Otros
+
+- **Conversión de v5 frente a v4:** las trayectorias son idénticas (verificado), pero
+  la conversión de v5 llega a **1412 %** con concentración constante (caso
+  `sta_constant_conc`). Se expone como `crystal_fraction_percent`, aparte
+  de `conversion_percent`.
+- **`SelectiveKMC` y `KMC_NoDesNoMig`** (en las dos líneas) producen exactamente las
+  mismas trayectorias con los mismos flags. Por eso se unificaron sin riesgo.
+- **Precisión de los CSV:** `conversion_history.csv` se escribía con `pandas.to_csv`
+  (unas 15 cifras significativas). El `.npy` guarda la precisión completa. Así se
+  mantiene.
+- **matplotlib moderno:** el `plotter_v2` original usa `plt.cm.get_cmap`, eliminado en
+  matplotlib 3.9, y fallaba en modo `surface`. Corregido en el `Plotter` unificado.
+
+### 4.4 Rendimiento (medido, red 80x80, σ=0.3, 300 eventos)
+
+| Motor | ms/evento |
+|---|---:|
+| `bkl_v4` original | 36.0 |
+| `KMC_BKL_Static`, valores por defecto (misma trayectoria) | 32.1 (reutiliza la clasificación de desorción para la incorporación) |
+| `KMC_BKL_Static(record_adsorption_probs=False)` | 17.9 (x1.8; en 40x40, x2.05) |
+
+Una corrida típica de `results/` (unos 50 000–210 000 eventos en 80x80) tarda por tanto entre 0.5 y 2 h. El cuello de botella sigue siendo reclasificar toda la red en cada evento (§8.5).
+
+---
+
+## 5. Diferencias deliberadas respecto a los originales
+
+Ninguna cambia la física ni la trayectoria:
+
+1. `_LatticeSize.__new__` acepta una tupla (§4.1).
+2. `Plotter(style="academic", mode="surface")` lanza `ValueError`. Antes dibujaba una
+   figura vacía.
+3. `plot_growth_rate_analysis` muestra los parámetros x/y de la línea estática. Antes
+   fallaba con `AttributeError` porque buscaba `p.E_pb_over_kT` y `p.delta`.
+4. En `run_single.py`, `--n-seeds` sí tiene efecto. En `pRun.py`/`pRunAni.py` no lo
+   tenía: el motor recibía 10 fijo. El valor por defecto del config es 10, el
+   efectivo de antes.
+5. `run_single.py` escribe en `--output-dir`. `pRun.py` escribía en el directorio
+   actual, y `pRun_v3` usaba el sufijo `_1` en los agregados.
+6. `metadata.json` guarda además `engine`, `init_mode`, `init_kwargs`, `N_bulk0`,
+   `constant_concentration`, `use_solvent`, `record_adsorption_probs`, `N_seed0`,
+   `git_commit` y `numpy_version`.
+7. Respecto a `propuesta_refac.md` §4: la masa cristalina de v5 se calcula bajo demanda
+   (`np.sum`) y no de forma incremental. El coste es despreciable frente a las 4
+   clasificaciones O(N) por paso, y no puede desincronizarse si alguien modifica
+   `lat.heights`.
+8. Estilo nuevo `Plotter(style="paper")` y método `plot_morphology_sequence`: azul =
+   capa completa (niveles < min(heights)), rojo = capa en crecimiento, como la Fig. 9
+   de `references/modern_kMC/`. No tiene original: lo cubre `TestPaperStyle`.
+
+---
+
+## 6. Qué se rompe en los notebooks de análisis (y cómo se arregla)
+
+| Consumidor | Qué deja de funcionar | Arreglo |
+|---|---|---|
+| `notebooks/final_results.ipynb` celda 1 | `from scipy.optimize import curve_fit` | `scipy` no está en `requirements.txt` ni en la lista de librerías permitidas |
+| `notebooks/final_results.ipynb` celdas 8–20 | `from model2D_v3 import ...` (D6: descartado) | Ninguno dentro de `src/`. Si se necesitan esas figuras, ejecutar esas celdas con `.descartables/scripts/` en `sys.path` |
+| `notebooks/results_1.ipynb` | `from plotter_v3 import Plotter_v3` | `from src import Plotter_v3` |
+| Todos los notebooks | `sys.path.append('/home/sgaviria/MalariaProject/')` | `sys.path.append('/home/sggphysics/kMC_Malaria')` (la raíz) |
+| Rutas de datos `/home/sgaviria/MalariaProject/results/...` (los 3 notebooks) | No existen en esta máquina | Cambiar por rutas relativas a la raíz (`results/...`) |
+| `reconstruct_kmc_from_metadata` (2 notebooks) | Sigue funcionando, pero reconstruye mal las corridas de §4.2 | `src.common.io.rebuild_from_metadata`, o los configs de `scripts/configs/results/` |
+
+---
+
+## 7. Promoción a la raíz (2026-09-29)
+
+### 7.1 Qué se movió
+
+Nada se borró. Se comprobó con un manifiesto de hashes SHA-256 que los 158 archivos
+afectados siguen existiendo, en su sitio nuevo.
+
+| Antes | Ahora |
+|---|---|
+| `refac/src/`, `refac/tests/`, `refac/scripts/`, `refac/archive/` | `src/`, `tests/`, `scripts/`, `archive/` |
+| `refac/requirements.txt` | `requirements.txt` |
+| `refac/notebooks/ejemplo_linea_*.ipynb` | `notebooks/` (junto a los de análisis) |
+| `refac/README.md` | este `README.md` (adaptado); el original, en `.descartables/pre_refactor/refac_README.md` |
+| `src/*` (21 `.py`, incluido `__init__.py` con cambios sin commitear) | `.descartables/pre_refactor/src/` |
+| `tests/*` (`test_bkl.py`, `test_lattice.py`, `test_utils.py`, `tests_suite.py`) | `.descartables/pre_refactor/tests/` (portados a `tests/dynamic/` y `tests/test_numerics.py`) |
+| `README.md`, `requirements.txt` | `.descartables/pre_refactor/raiz/` |
+| `CLAUDE.md`, `.github/copilot-instructions.md` | actualizados en su sitio; copia previa en `.descartables/pre_refactor/raiz/` |
+
+El detalle de cada archivo movido está en `.descartables/pre_refactor/README.md`.
+
+### 7.2 Git
+
+- `.gitignore` excluye `.descartables/*`. Para git, lo movido allí aparece como
+  **borrado**, aunque sigue en disco y en el historial (commit `6109612` y
+  anteriores).
+- No se ha hecho commit ni tag. Para dejar un punto de retorno explícito:
+
+```bash
+git tag pre-refactor 6109612              # último commit con el código original
+git switch -c refactor/dos-lineas
+# -A registra también la salida de los archivos antiguos de src/ y tests/
+git add -A src tests scripts archive requirements.txt README.md .github
+git add notebooks/ejemplo_linea_estatica.ipynb notebooks/ejemplo_linea_dinamica.ipynb
+git commit -m "Refactorización: dos líneas de motor (dinámica y estática)"
+```
+
+### 7.3 Pendiente de la promoción
+
+- Volver a ejecutar `python -m unittest discover -s tests -t .` desde la raíz. Solo se
+  cambiaron rutas: `tests/_paths.py` busca ahora el código original en
+  `.descartables/pre_refactor/src/`, así que los tests de paridad siguen activos.
+- `docs/source/*.md` (Sphinx) sigue describiendo la estructura antigua.
+
+---
+
+## 8. Pendiente (física, fuera del alcance de la refactorización)
+
+Estos puntos requieren decisión del autor y validación por separado (auditoría §5):
+1. Convenciones de conteo de enlaces. Los tests
+   `test_dynamic_lattice_counts_neighbors_at_or_above_h0` y
+   `test_static_lattice_counts_only_equal_height_neighbors` las **congelan** a
+   propósito.
+2. Factor `N_bulk/N0` duplicado en modo dinámico.
+3. Incorporación sin límite.
+4. Factor 2 de δ y significado de `fixed_sigma`.
+5. Rendimiento: clasificación incremental. Rompería la paridad bit a bit, así que
+   necesitaría validación estadística.

@@ -1,0 +1,35 @@
+{
+  "description": "Barrido de tamaños con densidad de semillas constante. Parámetros de src/pRun_v3.py.",
+  "source_script": "src/pRun_v3.py",
+  "engine": "static",
+  "params": {
+    "K0_plus": 0.2116718,
+    "K_inc_plus": 0.5069325183371898,
+    "E_pb_over_kT_x": 2.2704636027368603,
+    "E_pb_over_kT_y": 2.2704636027368603,
+    "phi_over_kT": 1.379247801207933,
+    "delta_x": 1.3,
+    "delta_y": 1.3,
+    "V": 1,
+    "C_eq": 15.0,
+    "fixed_sigma": 1,
+    "S_floor": -5.0,
+    "S_ceil": 9.0
+  },
+  "lattice": {
+    "seed": 42,
+    "init_mode": "flat",
+    "init_kwargs": {
+      "max_height": 1
+    }
+  },
+  "engine_kwargs": {
+    "N_bulk0": 2000,
+    "rng_seed": 123,
+    "time_scale": 100,
+    "constant_concentration": true
+  },
+  "n_seeds": 10000,
+  "seed_scaling": "density",
+  "plot_style": "v2"
+}
