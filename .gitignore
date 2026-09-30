@@ -2,7 +2,7 @@
 venv/
 
 # Ignorar carpeta de configuración de GitHub y acciones
-.github/
+#.github/
 
 # Ignorar carpeta de datos
 data/
